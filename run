@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+require 'pry'
+require 'date'
+
+def value_sanitizer(type, value, min, max)
+  return (value..value) if (value >= min && value <= max)
+  puts "Invalid #{type}"
+  exit 0
+end
+
+project_root = File.dirname(File.absolute_path(__FILE__))
+require project_root + '/puzzle.rb'
+Dir.glob(project_root + '/aoc**/**/*.rb') {|file| require file}
+
+if((ARGV & ['--help', '-h']).any?)
+  puts 'Usage:   ./run [OPTIONS]'
+  puts "\nThis command will run the solutions for the Advent  of  Code puzzle, you can set a specific puzzle by using the options bellow"
+  puts "\nOptions:"
+  puts '  -h, --help          Show this list of commands'
+  puts '  -y, --year number   Runs puzzles from that specific year (> 2015)'
+  puts '  -d, --day number    Runs puzzles from that specific day  (0-25)'
+  puts '  -p, --part number   Runs a specific part of the puzzles  (0-1)'
+  puts '  -v, --verbose       Shows puzzles that are yet to be implemented (careful, it prints a lot of text)'
+
+  exit 1
+end
+
+year = (2015..Date.today.year)
+day = (1..25)
+part = (1..2)
+verbose = false
+
+if((ARGV & ['--year', '-y']).any?)
+  arg_index = ARGV.index('--year') || ARGV.index('-y')
+  year = value_sanitizer("Year", ARGV[arg_index + 1].to_i, 2015, 2999)
+end
+
+if((ARGV & ['--day', '-d']).any?)
+  arg_index = ARGV.index('--day') || ARGV.index('-d')
+  day = value_sanitizer("Day", ARGV[arg_index + 1].to_i, 1, 25)
+end
+
+if((ARGV & ['--part', '-p']).any?)
+  arg_index = ARGV.index('--part') || ARGV.index('-p')
+  part = value_sanitizer("Part", ARGV[arg_index + 1].to_i, 1, 2)
+end
+
+if ((ARGV & ['--verbose', '-v']).any?)
+  verbose = true
+end
+
+year.each do |index_year|
+  day.each do |index_day|
+    part.each do |index_part|
+      klass = Object.const_get "AoC#{index_year}::Day#{index_day.to_s.rjust(2, "0")}::Part#{index_part.to_s.rjust(2, "0")}"
+      klass.execute
+    rescue NameError => e
+      puts e if verbose
+      next
+    end
+  end
+end
