@@ -1,3 +1,5 @@
+return true
+
 require 'gosu'
 require 'pry'
 
