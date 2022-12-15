@@ -16,6 +16,10 @@ class Puzzle
   attr_accessor :answer
 
   def input
-    @input ||= File.open(File.expand_path("..", self.method(:execute).source_location[0]) + "/input.txt").read.split("\n")
+    @input ||= raw_input.split("\n")
+  end
+
+  def raw_input
+    @raw_input ||= File.open(File.expand_path("..", self.method(:execute).source_location[0]) + "/input.txt").read
   end
 end
